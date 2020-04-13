@@ -1,4 +1,5 @@
 import paho.mqtt.client as mqtt
+import json
 
 
 # The callback for when the client receives a CONNACK response from the server.
@@ -7,23 +8,29 @@ def on_connect(client, userdata, flags, rc):
 
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
+    # Subscribing to "/devices/#" gives us subscription to all devices in the application.
     client.subscribe("engindividualprojectapplication/devices/#")
 
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
-    print(msg.topic+" "+str(msg.payload))
+    message_fields = json.loads(msg.payload.decode())
+    print(message_fields["app_id"])
+    try:
+        with open("data/message.json", "w") as f:
+            json.dump(message_fields, f)
+    except OSError:
+        print("File was unavailable, message skipped.")
 
 
-client = mqtt.Client()
-client.on_connect = on_connect
-client.on_message = on_message
-client.username_pw_set("engindividualprojectapplication", password="ttn-account-v2.BIashck8tyZXrhKUapfHMGRoCOsGSpX5Li7uS4nh6mk")
-
-client.connect("eu.thethings.network", 1883)
+mclient = mqtt.Client()
+mclient.on_connect = on_connect
+mclient.on_message = on_message
+mclient.username_pw_set("engindividualprojectapplication", password="ttn-account-v2.BIashck8tyZXrhKUapfHMGRoCOsGSpX5Li7uS4nh6mk")
+mclient.connect("eu.thethings.network", 1883)
 
 # Blocking call that processes network traffic, dispatches callbacks and
 # handles reconnecting.
 # Other loop*() functions are available that give a threaded interface and a
 # manual interface.
-client.loop_forever()
+mclient.loop_forever()
