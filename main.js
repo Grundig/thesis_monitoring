@@ -1,4 +1,3 @@
-let message_count = [0,0];
 let labels = [];
 let n, node, frame;
 
@@ -11,18 +10,23 @@ const tempChart = new Chart(tempCanv, {
     data: {
         labels: labels,
         datasets: [{
-            label: 'Node 0 Temperature',
+            label: 'Node 0',
             borderColor: 'rgb(255, 99, 132)',
             data: [],
             fill: false
         },{
-            label: 'Node 1 Temperature',
+            label: 'Node 1',
             borderColor: 'rgb(132,120,255)',
             data: [],
             fill: false
         }]
     },
-    options: {}
+    options: {
+        title: {
+            display: true,
+            text: 'Temperature'
+        }
+    }
 });
 
 const humidChart = new Chart(humidCanv, {
@@ -30,18 +34,22 @@ const humidChart = new Chart(humidCanv, {
     data: {
         labels: labels,
         datasets: [{
-            label: 'Node 0 Humidity',
+            label: 'Node 0',
             borderColor: 'rgb(255, 99, 132)',
             data: [],
             fill: false
         },{
-            label: 'Node 1 Humidity',
+            label: 'Node 1',
             borderColor: 'rgb(132,120,255)',
             data: [],
             fill: false
         }]
     },
-    options: {}
+    options: {
+        title: {
+            display: true,
+            text: 'Humidity'
+        }}
 });
 
 const lumiChart = new Chart(lumiCanv, {
@@ -49,23 +57,27 @@ const lumiChart = new Chart(lumiCanv, {
     data: {
         labels: labels,
         datasets: [{
-            label: 'Node 0 Luminosity',
+            label: 'Node 0',
             borderColor: 'rgb(255, 99, 132)',
             data: [],
             fill: false
         },{
-            label: 'Node 1 Luminosity',
+            label: 'Node 1',
             borderColor: 'rgb(132,120,255)',
             data: [],
             fill: false
         }]
     },
-    options: {}
+    options: {
+        title: {
+            display: true,
+            text: 'Luminosity'
+        }}
 });
 
 setInterval(function () {
     getData();
-}, 3000);
+}, 900000); //get data every 15 minutes
 
 
 function getData(){
@@ -119,23 +131,15 @@ function plotting(){
 
 
     n = parseInt(node_id.charAt(node_id.length - 1));
-    message_count[n]++;
-
     tempChart.data.datasets[n].data.push(temperature);
     humidChart.data.datasets[n].data.push(humidity);
     lumiChart.data.datasets[n].data.push(luminosity);
 
-    console.log(tempChart.data.datasets[n].data.length)
+    if (labels.length >= 192) {
+        labels.shift(); //removes the first element from all the graphs.
+    }                   //192 is the amount of 15 minute intervals within 48 hours
 
     tempChart.update();
     humidChart.update();
     lumiChart.update();
-
-    if (message_count > 100){
-        // Plotly.releyout(node_number, {
-        //     xaxis:{
-        //         range: [message_count-100, message_count]
-        //     }
-        // })
-    }
 }
